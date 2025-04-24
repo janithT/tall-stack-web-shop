@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Log;
+use App\Livewire\Validators\OrderFormValidator;
 
 class Index extends Component
 {
@@ -29,10 +30,10 @@ class Index extends Component
     // Place order method
     public function placeOrder()
     {
-        $this->validate([
-            'customerName' => 'required',
-            'customerEmail' => 'required|email',
-            'quantity' => 'required|integer|min:1',
+        $validated = OrderFormValidator::validate([
+            'customerName' => $this->customerName,
+            'customerEmail' => $this->customerEmail,
+            'quantity' => $this->quantity,
         ]);
 
         try {

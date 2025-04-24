@@ -69,16 +69,25 @@
                 <div>
                     <label class="block mb-1">Your Name</label>
                     <input type="text" wire:model="customerName" class="w-full px-4 py-2 border rounded" required>
+                    @error('customerName') 
+                        <span class="text-red-500 text-sm">{{ $message }}</span> 
+                    @enderror
                 </div>
 
                 <div>
                     <label class="block mb-1">Email</label>
                     <input type="email" wire:model="customerEmail" class="w-full px-4 py-2 border rounded" required>
+                    @error('customerEmail') 
+                        <span class="text-red-500 text-sm">{{ $message }}</span> 
+                    @enderror
                 </div>
 
                 <div>
                     <label class="block mb-1">Quantity</label>
                     <input type="number" wire:model="quantity" class="w-full px-4 py-2 border rounded" min="1" required>
+                    @error('quantity') 
+                        <span class="text-red-500 text-sm">{{ $message }}</span> 
+                    @enderror
                 </div>
 
                 <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
