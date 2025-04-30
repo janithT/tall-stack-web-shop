@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Shop\Index;
+use App\Livewire\Shop\ListProducts;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,4 +13,5 @@ use App\Livewire\Shop\Index;
 |
 */
 
-Route::get('/', Index::class)->name('shop');
+Route::get('/', ListProducts::class)->name('shop.index');
+Route::get('/cart', ListProducts::class)->name('cart.index');

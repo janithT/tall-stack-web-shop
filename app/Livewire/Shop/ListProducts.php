@@ -9,8 +9,10 @@ use App\Models\Order;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Log;
 use App\Livewire\Validators\OrderFormValidator;
+use App\Services\CustomerService;
+use App\Services\OrderService;
 
-class Index extends Component
+class ListProducts extends Component
 {
     public $search = '';
     public $sortBy = 'name';
@@ -21,14 +23,20 @@ class Index extends Component
     public $customerEmail;
     public $quantity = 1;
 
+
     public function selectProduct($productId)
     {
         $this->selectedProduct = Product::find($productId);
     }
-    
+
+    public function updatedSortBy($value)
+    {
+        Log::info('Sort by updated: ' . $value);
+        $this->sortBy = $value;
+    }
 
     // Place order method
-    public function placeOrder()
+    public function placeOrder(CustomerService $customerService, OrderService $orderService)
     {
         $validated = OrderFormValidator::validate([
             'customerName' => $this->customerName,
@@ -40,19 +48,15 @@ class Index extends Component
             /* 
             Create or update the customer from customer model
             or use service class to create customer.
-
-            $customer =  $this->customerModel->CreateCustomer([
-                'name' => $this->customerName,
-                'email' => $this->customerEmail)
-
             */
-            $customer = Customer::firstOrCreate(
-                ['email' => $this->customerEmail],
-                ['name' => $this->customerName]
-            );
-        
+
+            $customer = $customerService->createCustomer([
+                'name' => $validated['customerName'],
+                'email' => $validated['customerEmail'],
+            ]);
+
             // Create order with relationships- same as above
-            $order = Order::create([
+            $order = $orderService->createOrders([
                 'product_id' => $this->selectedProduct->id,
                 'customer_id' => $customer->id,
                 'quantity' => $this->quantity,
@@ -67,10 +71,9 @@ class Index extends Component
                 $this->reset(['selectedProduct', 'customerName', 'customerEmail', 'quantity']);
             }
             
-
             session()->flash('message', 'Order placed successfully!');
-
             $this->reset(['customerName', 'customerEmail', 'quantity', 'selectedProduct']);
+
         } catch (\Throwable $th) {
             //throw $th;
             session()->flash('error', $th->getMessage());
@@ -82,6 +85,7 @@ class Index extends Component
     // Reset selected product
     public function render()
     {
+
         $products = Product::query()
             ->when($this->selectedCategory, fn($q) => $q->whereHas('categories', fn($q) => $q->where('categories.id', $this->selectedCategory)))
             ->when($this->search, fn($q) => $q->where('name', 'like', '%' . $this->search . '%'))

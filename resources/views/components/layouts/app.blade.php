@@ -7,6 +7,9 @@
     @livewireStyles
 </head>
 <body class="bg-gray-100 text-gray-800">
+
+    <x-header/>
+    
     <div class="min-h-screen py-10">
         {{ $slot }}
     </div>

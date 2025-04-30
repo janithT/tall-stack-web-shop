@@ -30,7 +30,7 @@
             <!-- Sort Options -->
             <div>
                 <h2 class="font-semibold text-lg mb-2">Sort by</h2>
-                <select wire:model="sortBy" class="w-full px-3 py-2 border rounded">
+                <select wire:model.live="sortBy" class="w-full px-3 py-2 border rounded">
                     <option value="name">Name (A-Z)</option>
                     <option value="price">Price (Low to High)</option>
                 </select>
@@ -39,7 +39,7 @@
             <!-- Search -->
             <div>
                 <h2 class="font-semibold text-lg mb-2">Search</h2>
-                <input type="text" wire:model.debounce.500ms="search" placeholder="Search products..."
+                <input type="text" wire:model.live.debounce.500ms="search" placeholder="Search products..."
                     class="w-full px-3 py-2 border rounded">
             </div>
         </div>
