@@ -17,6 +17,9 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+use App\Filament\Pages\Auth\LoginPage;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -26,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(LoginPage::class)
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -54,6 +57,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                \App\Http\Middleware\EnsureUserIsAdmin::class,
             ]);
+    }
+
+    public function boot(): void
+    {
+        Gate::define('viewFilament', function ($user) {
+            return $user->hasRole('admin');
+        });
     }
 }

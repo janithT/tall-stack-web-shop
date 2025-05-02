@@ -11,9 +11,9 @@ class OrderService
     public function createOrders(array $data)
     {
         return Order::create([
-            'product_id' => $this->selectedProduct->id,
-            'customer_id' => $customer->id,
-            'quantity' => $this->quantity,
+            'product_id' => $data['product_id'],
+            'user_id' => $data['customer_id'],
+            'quantity' => $data['quantity'],
         ]);
     }
 

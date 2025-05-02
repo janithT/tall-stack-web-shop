@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Livewire\Validators\OrderFormValidator;
 use App\Services\CustomerService;
 use App\Services\OrderService;
+use Illuminate\Support\Facades\DB;
 
 class ListProducts extends Component
 {
@@ -44,40 +45,39 @@ class ListProducts extends Component
             'quantity' => $this->quantity,
         ]);
 
-        try {
-            /* 
-            Create or update the customer from customer model
-            or use service class to create customer.
-            */
 
+        try {
+            DB::beginTransaction();
+        
+            // Create or find customer
             $customer = $customerService->createCustomer([
                 'name' => $validated['customerName'],
                 'email' => $validated['customerEmail'],
             ]);
-
-            // Create order with relationships- same as above
+        
+            // Create the order
             $order = $orderService->createOrders([
                 'product_id' => $this->selectedProduct->id,
                 'customer_id' => $customer->id,
                 'quantity' => $this->quantity,
             ]);
-
-            // Reduce product stock - not available in this example
-            // $this->selectedProduct->stock -= $this->quantity;
-            // $this->selectedProduct->save();
         
-            if ($order) {
-                session()->flash('message', 'Order placed successfully!');
-                $this->reset(['selectedProduct', 'customerName', 'customerEmail', 'quantity']);
-            }
-            
+            // Optional: Reduce product stock here if implemented
+            // $this->selectedProduct->decrement('stock', $this->quantity);
+        
+            DB::commit();
+        
             session()->flash('message', 'Order placed successfully!');
-            $this->reset(['customerName', 'customerEmail', 'quantity', 'selectedProduct']);
-
+            $this->reset(['selectedProduct', 'customerName', 'customerEmail', 'quantity']);
+        
         } catch (\Throwable $th) {
-            //throw $th;
-            session()->flash('error', $th->getMessage());
-            Log::error('Error placing order: ' . $th->getMessage());
+            DB::rollBack();
+        
+            session()->flash('error', 'Failed to place order.');
+            Log::error('Order placement error: ' . $th->getMessage());
+        
+            // Optional: Show detailed error while debugging
+            // throw $th;
         }
         
     }
